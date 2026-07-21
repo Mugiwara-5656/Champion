@@ -1,0 +1,43 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Pose extraction workspace — ephemeral, recreatable
+tools/pose-extract/.venv/
+tools/pose-extract/videos/
+tools/pose-extract/frames/
+tools/pose-extract/poses/
+
+# Large MP4 sources mirrored into public/videos/ — not committed
+public/videos/
+
+# Python bytecode cache
+__pycache__/
+*.pyc
+
+# Claude Code machine-specific settings (absolute paths, per-machine)
+.claude/settings.local.json
+
+# Accidental doubled-path copy of the pose model
+tools/pose-extract/tools/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
