@@ -19,7 +19,9 @@ tools/pose-extract/frames/
 tools/pose-extract/poses/
 
 # Large MP4 sources mirrored into public/videos/ — not committed
-public/videos/
+public/videos/*
+# ...but keep the docs that explain what those clips are and how they're paired
+!public/videos/README.md
 
 # Python bytecode cache
 __pycache__/
