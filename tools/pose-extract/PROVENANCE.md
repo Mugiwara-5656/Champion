@@ -41,6 +41,29 @@ crops x1=0.62/0.66: lock onto the kicker but vis 0.17/0.03 with the kicking
 ankle pinned to the crop edge. x1=0.70: no detection. Pick a different frame;
 `mt_hip` stays prototype.
 
+## Footage screening (`screen_footage.py`)
+
+Pre-flight quality screener: samples 12 frames, IMAGE mode, num_poses=4, and
+issues USABLE / MARGINAL / HOSTILE from two criteria — mean vis_min of the 13
+pipeline keypoints, and single-person detection rate.
+
+Calibration (2026-07-23), verified against ground truth on all three known
+clips:
+
+| Clip | mean vis_min | single-person | Verdict | Failing criterion |
+|---|---|---|---|---|
+| public/videos/jab.mp4 | 0.933 | 12/12 (100%) | USABLE | — |
+| public/videos/roundhouse.mp4 | 0.063 | 12/12 (100%) | HOSTILE | visibility only |
+| tools .../roundhouse_v2.mp4 | 0.419 | 1/12 (8%) | HOSTILE | person count only |
+
+The two hostile clips fail on *different, independent* axes: the trimmed
+bag-work roundhouse tracks a single person confidently except for near-zero
+leg keypoints (localized visibility failure), while the v2 sparring footage
+has good visibility but two fighters in frame (chimera-prone person-count
+failure — the cause of the f1357 dead end). Neither criterion alone catches
+both, which is why the verdict needs both. Screen new footage with this tool
+before investing in per-frame extraction.
+
 ## Normalization rules (`normalize_one.py`)
 
 | Rule | Vertical | Horizontal | Flag |
