@@ -6,7 +6,9 @@ extended laterally (not tucked straight under the knee), other foot planted.
 Reports the top frames by a hip-drive quality score with honest vis_min.
 
 Usage:
-  python scan_hipdrive.py <video> [step=1] [top=15]
+  python scan_hipdrive.py <video> [step=1] [top=15] [f0] [f1]
+
+f0/f1 constrain the scan to a frame range (inclusive).
 """
 import sys
 
@@ -22,9 +24,13 @@ def main():
     video = sys.argv[1]
     step = int(sys.argv[2]) if len(sys.argv) > 2 else 1
     top = int(sys.argv[3]) if len(sys.argv) > 3 else 15
+    f0 = int(sys.argv[4]) if len(sys.argv) > 4 else 0
+    f1 = int(sys.argv[5]) if len(sys.argv) > 5 else None
     ensure_model()
     cap = cv2.VideoCapture(video)
     fps = cap.get(cv2.CAP_PROP_FPS)
+    if f0:
+        cap.set(cv2.CAP_PROP_POS_FRAMES, f0)
     options = mp_vision.PoseLandmarkerOptions(
         base_options=mp_tasks.BaseOptions(model_asset_path=MODEL_PATH),
         running_mode=mp_vision.RunningMode.IMAGE,
@@ -34,8 +40,10 @@ def main():
     lm = mp_vision.PoseLandmarker.create_from_options(options)
 
     cands = []
-    fnum = 0
+    fnum = f0
     while True:
+        if f1 is not None and fnum > f1:
+            break
         ok, frame = cap.read()
         if not ok:
             break

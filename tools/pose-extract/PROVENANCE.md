@@ -2,8 +2,9 @@
 
 Verified 2026-07-23 by recomputing each literal from its source and matching
 against `src/data/poses.js`. "Extracted" poses only — all others in poses.js
-are hand-authored prototypes (including `mt_hip`, kept as prototype after
-roundhouse_v2 f1357 proved unextractable — see below).
+are hand-authored prototypes (including `mt_hip`, closed as
+permanently-prototype after both the roundhouse_v2 f1357 dead end and the
+roundhouse_original kick-apex occlusion finding — see below).
 
 ## Sources
 
@@ -53,8 +54,9 @@ clips:
 | Clip | mean vis_min | single-person | Verdict | Failing criterion |
 |---|---|---|---|---|
 | public/videos/jab.mp4 | 0.933 | 12/12 (100%) | USABLE | — |
-| public/videos/roundhouse.mp4 | 0.063 | 12/12 (100%) | HOSTILE | visibility only |
+| public/videos/roundhouse.mp4 (trim) | 0.063 | 12/12 (100%) | HOSTILE | visibility only |
 | tools .../roundhouse_v2.mp4 | 0.419 | 1/12 (8%) | HOSTILE | person count only |
+| public/videos/roundhouse_original.mp4 | 0.762 | 40/40 (100%) | USABLE | — (but see caveat) |
 
 The two hostile clips fail on *different, independent* axes: the trimmed
 bag-work roundhouse tracks a single person confidently except for near-zero
@@ -63,6 +65,49 @@ has good visibility but two fighters in frame (chimera-prone person-count
 failure — the cause of the f1357 dead end). Neither criterion alone catches
 both, which is why the verdict needs both. Screen new footage with this tool
 before investing in per-frame extraction.
+
+**Screener caveat — averages hide apex hostility.** The screener's
+evenly-spaced samples overwhelmingly land on stance/reset moments between
+techniques, so it measures *average clip quality*, not extractability of the
+frames you actually want. roundhouse_original screens USABLE at 0.762 while
+its kick drive phases run vis 0.01–0.16 (below). A clip can screen USABLE
+and still be hostile at every technique apex. Screen the specific window of
+interest (`--start/--end`), and treat even that as necessary-not-sufficient —
+only a dense per-frame probe of the technique arc settles it.
+
+## Kick apexes are structurally unextractable in roundhouse_original
+
+The earlier "roundhouse is MediaPipe-hostile" verdict needs correcting:
+**roundhouse_original.mp4 is NOT hostile as a source** (USABLE, 0.762 mean
+over 40 samples). The trimmed public/videos/roundhouse.mp4 was cut from
+T=163.65–165.20 — inside the 140–165s dark-bag dead zone, one of the worst
+pockets in the whole video. The hostility verdict was true of that trim, not
+the source.
+
+The real problem is spatial, not clip quality: **vis collapses the moment
+the kicking leg crosses the black bag silhouette and recovers the frame it
+clears.** Frame-level evidence, dense probe f8490–8530 (t≈283.3–284.6s, the
+best-tracked kick in the cleanest window):
+
+- stance 8490–8493: vis 0.99→0.62; lift/drive/impact 8494–8510: vis
+  0.01–0.42; recovery 8516–8530: vis 0.92–0.99. Boundary transitions are
+  one frame wide (8515→8516: 0.21→0.92).
+- drive phase proper (8503–8507, knee above hip, ankle driving into the
+  bag): vis 0.01–0.16.
+- the only knee-above-hip frame over 0.5 is **8513 (vis 0.70)** — a
+  *retraction chamber* (ankle tucked under knee, ank_lat 0.012), nearly
+  duplicating mt_chamber. Wrong phase.
+- during occlusion MediaPipe **hallucinates planted feet** (f8496–8501 show
+  both ankles at the old stance position while the leg is visibly lifting).
+  Low vis here means actively wrong, not merely uncertain.
+
+Since every kick in this footage drives into the same bag, the mechanism
+applies to all of them (five kicks in the 256–306s window all show the same
+low-vis apex signature; the ~288s kick's 0.37 extension frame is the best
+and still fails). **mt_hip remains prototype — not recoverable from this
+source.** A usable mt_hip extraction needs footage where the kick apex is
+not occluded: shadowboxing, pads held clear of the arc, or a light
+background.
 
 ## Normalization rules (`normalize_one.py`)
 
